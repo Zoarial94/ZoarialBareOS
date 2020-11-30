@@ -1,9 +1,8 @@
 /* Declare constants for the multiboot header. */
-.set ALIGN,    1<<0             /* align loaded modules on page boundaries */
-.set MEMINFO,  1<<1             /* provide memory map */
-.set FLAGS,    ALIGN | MEMINFO  /* this is the Multiboot 'flag' field */
-.set MAGIC,    0x1BADB002       /* 'magic number' lets bootloader find the header */
-.set CHECKSUM, -(MAGIC + FLAGS) /* checksum of above, to prove we are multiboot */
+.set MAGIC,    0xE85250D6       /* 'magic number' lets bootloader find the header */
+.set ARCH,     0
+.set HEADER_LEN,   header_start-header_end
+.set CHECKSUM, -(MAGIC + HEADER_LEN + ARCH) /* checksum of above, to prove we are multiboot */
  
 /* 
 Declare a multiboot header that marks the program as a kernel. These are magic
@@ -14,9 +13,25 @@ forced to be within the first 8 KiB of the kernel file.
 */
 .section .multiboot
 .align 4
+header_start:
+
 .long MAGIC
-.long FLAGS
+.long ARCH
+.long HEADER_LEN
 .long CHECKSUM
+
+.short 5 #Framebuffer
+.short 0
+.long 20
+.long 640 
+.long 480 
+.long 32
+
+.short 0
+.short 0
+.long 8
+
+header_end:
  
 /*
 The multiboot standard does not define the value of the stack pointer register
