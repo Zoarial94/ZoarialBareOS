@@ -37,15 +37,22 @@ INC := -I include
 MAINOBJS := $(COBJECTS) $(ASOBJECTS)
 EXAMOBJS := $(OBJECTS) $(BUILDDIR)/example.o
 
+$(shell mkdir -p $(BUILDDIR) $(DEPDIR) bin/)
+
+TREE := $(shell find $(SRCDIR) -type d)
+
+$(shell mkdir -p $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(TREE)))
+$(shell mkdir -p $(patsubst $(SRCDIR)/%, $(DEPDIR)/%, $(TREE)))
 
 #Compile Target
 bin/ZoarialBareOS.iso: bin/ZoarialBareOS.bin bin/grub.cfg
-	grub2-mkrescue -o myos.iso isodir
+	grub2-mkrescue -o $@ $(BUILDDIR)/isodir
 
 bin/ZoarialBareOS.bin: $(MAINOBJS)
 	@echo " Linking... $(MAINOBJS)"
 	$(CXX) -T $(SRCDIR)/linker.ld $^ -o $@ -ffreestanding -O2 -nostdlib -lgcc
 	grub2-file --is-x86-multiboot $@
+	mkdir -p $(BUILDDIR)/isodir/boot/
 	cp $@ $(BUILDDIR)/isodir/boot/
 
 
@@ -89,7 +96,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(ASSRCEXT)
 #Clean
 clean:
 	@echo " Cleaning..."; 
-	$(RM) -r $(BUILDDIR) $(DEPDIR) $(TARGET)
+	$(RM) -r $(BUILDDIR) $(DEPDIR) bin/
 
 .PHONY: clean
 
