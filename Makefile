@@ -83,7 +83,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(CSRCEXT)
 	@cp -f $(DEPDIR)/$*.d $(DEPDIR)/$*.d.tmp
 	@sed -e 's/.*://' -e 's/\\$$//' < $(DEPDIR)/$*.d.tmp | fmt -1 | \
 	sed -e 's/^ *//' -e 's/$$/:/' >> $(DEPDIR)/$*.d
-	@rm -f $(DEPDIR)/$*.d.tm
+	@rm -f $(DEPDIR)/$*.d.tmp
 
 #Create object files
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(ASSRCEXT)
