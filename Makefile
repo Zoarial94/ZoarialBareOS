@@ -4,7 +4,7 @@ C := i686-elf-gcc
 CXX := i686-elf-g++
 AS := i686-elf-as
 SRCDIR := src
-SRCDIRS := src/arch/$(ARCH) src/kernel
+SRCDIRS := src/arch/$(ARCH) src/kernel src/libc
 BUILDDIR := build
 INCDIR := include
 TARGET := bin/ZoarialBareOS.iso
@@ -31,8 +31,8 @@ DEPENDENCIES := $(DEPENDENCIES) $(patsubst $(SRCDIR)/%,$(DEPDIR)/%,$(CPPSOURCES:
 
 LIB := 
 LIBDIR :=  
-FLAGS := -O2 -Wall -Wextra -g
-CFLAGS := $(FLAGS) -std=gnu99 -ffreestanding
+FLAGS := -O2 -Wall -Wextra -g -D__is_kernel -ffreestanding
+CFLAGS := $(FLAGS) -std=gnu99 
 CXXFLAGS := $(FLAGS) -std=c++17
 ASFLAGS := 
 INC := -I include/ -I include/libc/
@@ -52,14 +52,15 @@ $(shell mkdir -p $(patsubst $(SRCDIR)/%, $(DEPDIR)/%, $(TREE)))
 
 #Compile Target
 bin/ZoarialBareOS.iso: bin/ZoarialBareOS.bin bin/grub.cfg
+	cp bin/ZoarialBareOS.bin $(BUILDDIR)/isodir/boot/
+	cp $(SRCDIR)/grub.cfg $(BUILDDIR)/isodir/boot/grub/grub.cfg
 	grub2-mkrescue -o $@ $(BUILDDIR)/isodir
 
 bin/ZoarialBareOS.bin: $(MAINOBJS)
 	@echo " Linking... $(MAINOBJS)"
-	$(CXX) -T $(SRCDIR)/linker.ld $^ -o $@ -ffreestanding -O2 -nostdlib -lgcc
+	$(C) -T $(SRCDIR)/linker.ld $^ -o $@ -ffreestanding -O2 -nostdlib -lgcc
 	grub2-file --is-x86-multiboot $@
-	mkdir -p $(BUILDDIR)/isodir/boot/
-	cp $@ $(BUILDDIR)/isodir/boot/
+	mkdir -p $(BUILDDIR)/isodir/boot/grub
 
 
 bin/grub.cfg: $(SRCDIR)/grub.cfg
