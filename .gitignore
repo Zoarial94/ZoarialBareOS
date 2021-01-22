@@ -1,6 +1,7 @@
 bin/
 dep/
 build/
+tmp/
 
 # ---> C++
 # Compiled Object files
