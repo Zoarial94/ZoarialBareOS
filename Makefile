@@ -1,10 +1,8 @@
 #Standard Compiling Options
-
-#Something weird with i386 vs i686
-ARCH ?= i386
-C := i686-elf-gcc
-CXX := i686-elf-g++
-AS := i686-elf-as
+ARCH ?= i686
+C := $(ARCH)-elf-gcc
+CXX := $(ARCH)-elf-g++
+AS := $(ARCH)-elf-as
 
 #Separate out source directories for better compartmentalization
 SRCDIR 			:= src
@@ -26,13 +24,13 @@ CPPINCEXT := hpp
 ASSRCEXT := s
 
 #Locate C and C++ files
-CSOURCES := $(shell find $(SRCDIRS) -type f -name "*.$(CSRCEXT)")
-CPPSOURCES := $(shell find $(SRCDIRS) -type f -name "*.$(CPPSRCEXT)")
+CSOURCES := $(shell find $(SRCDIR) -type f -name "*.$(CSRCEXT)")
+CPPSOURCES := $(shell find $(SRCDIR) -type f -name "*.$(CPPSRCEXT)")
 #Get object files from C and C++ source files 
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CSOURCES:.$(CSRCEXT)=.o)) $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CPPSOURCES:.$(CPPSRCEXT)=.o))
 
 #Get assembly source files and create objects from them 
-ASSOURCES := $(shell find $(SRCDIRS) -type f -name "*.$(ASSRCEXT)")
+ASSOURCES := $(shell find $(SRCDIR) -type f -name "*.$(ASSRCEXT)")
 ASOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(ASSOURCES:.$(ASSRCEXT)=.o))
 
 #Find dependencies from C and C++ source files
@@ -43,7 +41,7 @@ DEPENDENCIES := $(DEPENDENCIES) $(patsubst $(SRCDIR)/%,$(DEPDIR)/%,$(CPPSOURCES:
 #Directories needed by gcc 
 LIB := 
 LIBDIR :=  
-INC := -I include/ -I include/libc/
+INC := -I include/ -I include/libc/ -I include/ACPICA
 
 #Combined flags (Both C and C++)
 FLAGS := -O2 -Wall -Wextra -g -D__is_kernel -ffreestanding -fstack-protector
@@ -66,8 +64,8 @@ GLOBALARCHDIR	:= $(BUILDDIR)/arch/global-$(ARCH)
 CRTBEGINOBJ := $($(C) $(CFLAGS) -print-file-name=crtbegin.o)
 CRTENDOBJ := $($(C) $(CFLAGS) -print-file-name=crtend.o)
 
-CRTBEGIN := $(GLOBALARCHDIR)/crti.o $(GLOBALARCHDIR)/crtbegin.o
-CRTEND := $(GLOBALARCHDIR)/crtend.o $(GLOBALARCHDIR)/crtn.o
+CRTBEGIN := $(GLOBALARCHDIR)/crti.o $(CRTBEGINOBJ)
+CRTEND := $(CRTENDOBJ) $(GLOBALARCHDIR)/crtn.o
 
 #Order the objects to prevent weird gcc bugs with global constructors
 MAINOBJS := $(CRTBEGIN) $(OBJECTS) $(ASOBJECTS) $(CRTEND)
@@ -143,11 +141,6 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(ASSRCEXT)
 	@mkdir -p $(DEPDIR)
 #Compile object
 	$(AS) $(ASFLAGS) -o $@ $<
-
-$(GLOBALARCHDIR)/crtbegin.o $(GLOBALARCHDIR)/crtend.o:
-	OBJ=`$(C) $(CFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
-
-
 
 #Clean
 clean:

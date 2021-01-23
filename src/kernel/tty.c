@@ -1,5 +1,5 @@
 #include <kernel/tty.h>
-#include <arch/i386/vga.h>
+#include <arch/i686/vga.h>
 #include <string.h>
 
 size_t terminal_row;
