@@ -2,6 +2,7 @@ bin/
 dep/
 build/
 tmp/
+.vscode/
 
 # ---> C++
 # Compiled Object files
