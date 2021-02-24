@@ -67,6 +67,8 @@ CRTENDOBJ := $(shell $(C) $(CFLAGS) -print-file-name=crtend.o)
 CRTBEGIN := $(GLOBALARCHDIR)/crti.o $(CRTBEGINOBJ)
 CRTEND := $(CRTENDOBJ) $(GLOBALARCHDIR)/crtn.o
 
+LINKERFILE := $(SRCDIR)/linker.lds
+
 MAKEOBJS := $(GLOBALARCHDIR)/crti.o $(GLOBALARCHDIR)/crtn.o $(BUILDDIR)/linker.lds $(OBJECTS) $(ASOBJECTS)
 
 #Order the objects to prevent weird gcc bugs with global constructors
@@ -87,7 +89,7 @@ bin/ZoarialBareOS.bin: $(MAKEOBJS)
 bin/grub.cfg: $(SRCDIR)/grub.cfg
 	cp $(SRCDIR)/grub.cfg bin/grub.cfg
 
-$(BUILDDIR)/linker.lds: $(SRCDIR)/linker.lds.S
+$(BUILDDIR)/linker.lds: $(LINKERFILE)
 	$(C) $(CFLAGS) $(INC) -E -P -o $@ -x c-header $^
 
 #Include dependencies which are created
