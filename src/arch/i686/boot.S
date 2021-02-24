@@ -1,3 +1,4 @@
+#include <arch/i686/memory.h>
 /* Declare constants for the multiboot header. */
 .set ALIGN,    1<<0             /* align loaded modules on page boundaries */
 .set MEMINFO,  1<<1             /* provide memory map */
@@ -42,16 +43,17 @@ stack_bottom:
 .skip 16384 # 16 KiB
 stack_top:
 
-# Preallocate pages used for paging. Don't hard-code addresses and assume they
-# are available, as the bootloader might have loaded its multiboot structures or
-# modules there. This lets the bootloader know it must avoid the addresses.
+/*
+Preallocate pages used for paging. Don't hard-code addresses and assume they
+are available, as the bootloader might have loaded its multiboot structures or
+modules there. This lets the bootloader know it must avoid the addresses.
+*/
 .section .bss, "aw", @nobits
 	.align 4096
 boot_page_directory:
 	.skip 4096
 boot_page_table1:
 	.skip 4096
-# Further page tables may be required if the kernel grows beyond 3 MiB.
  
 /*
 The linker script specifies _start as the entry point to the kernel and the
@@ -74,24 +76,19 @@ _start:
 	itself. It has absolute and complete power over the
 	machine.
 	*/
-		# Physical address of boot_page_table1.
-	# TODO: I recall seeing some assembly that used a macro to do the
-	#       conversions to and from physical. Maybe this should be done in this
-	#       code as well?
-	movl $(boot_page_table1 - 0xC0000000), %edi
+	movl $(PAGE_OFFSET), %ebx
+	# Physical address of boot_page_table1.
+	movl $(boot_page_table1 - PAGE_OFFSET), %edi
 	# First address to map is address 0.
-	# TODO: Start at the first kernel page instead. Alternatively map the first
-	#       1 MiB as it can be generally useful, and there's no need to
-	#       specially map the VGA buffer.
 	movl $0, %esi
 	# Map 1023 pages. The 1024th will be the VGA text buffer.
 	movl $1023, %ecx
 
 1:
 	# Only map the kernel.
-	cmpl $(_kernel_start), %esi
+	cmpl $(_kernel_physical_start), %esi
 	jl 2f
-	cmpl $(_kernel_end - 0xC0000000), %esi
+	cmpl $(_kernel_end - PAGE_OFFSET), %esi
 	jge 3f
 
 	# Map physical address as "present, writable". Note that this maps
@@ -110,7 +107,7 @@ _start:
 
 3:
 	# Map VGA video memory to 0xC03FF000 as "present, writable".
-	movl $(0x000B8000 | 0x003), boot_page_table1 - 0xC0000000 + 1023 * 4
+	movl $(0x000B8000 | 0x003), boot_page_table1 - PAGE_OFFSET + 1023 * 4
 
 	# The page table is used at both page directory entry 0 (virtually from 0x0
 	# to 0x3FFFFF) (thus identity mapping the kernel) and page directory entry
@@ -120,11 +117,11 @@ _start:
 	# would instead page fault if there was no identity mapping.
 
 	# Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
-	movl $(boot_page_table1 - 0xC0000000 + 0x003), boot_page_directory - 0xC0000000 + 0
-	movl $(boot_page_table1 - 0xC0000000 + 0x003), boot_page_directory - 0xC0000000 + 768 * 4
+	movl $(boot_page_table1 - PAGE_OFFSET + 0x003), boot_page_directory - PAGE_OFFSET + 0
+	movl $(boot_page_table1 - PAGE_OFFSET + 0x003), boot_page_directory - PAGE_OFFSET + 768 * 4
 
 	# Set cr3 to the address of the boot_page_directory.
-	movl $(boot_page_directory - 0xC0000000), %ecx
+	movl $(boot_page_directory - PAGE_OFFSET), %ecx
 	movl %ecx, %cr3
 
 	# Enable paging and the write-protect bit.
