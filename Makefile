@@ -67,7 +67,7 @@ CRTENDOBJ := $(shell $(C) $(CFLAGS) -print-file-name=crtend.o)
 CRTBEGIN := $(GLOBALARCHDIR)/crti.o $(CRTBEGINOBJ)
 CRTEND := $(CRTENDOBJ) $(GLOBALARCHDIR)/crtn.o
 
-MAKEOBJS := $(GLOBALARCHDIR)/crti.o $(GLOBALARCHDIR)/crtn.o $(SRCDIR)/linker.ld $(OBJECTS) $(ASOBJECTS)
+MAKEOBJS := $(GLOBALARCHDIR)/crti.o $(GLOBALARCHDIR)/crtn.o $(BUILDDIR)/linker.lds $(OBJECTS) $(ASOBJECTS)
 
 #Order the objects to prevent weird gcc bugs with global constructors
 MAINOBJS := $(CRTBEGIN) $(OBJECTS) $(ASOBJECTS) $(CRTEND)
@@ -82,10 +82,13 @@ bin/ZoarialBareOS.iso: bin/ZoarialBareOS.bin bin/grub.cfg
 
 bin/ZoarialBareOS.bin: $(MAKEOBJS) 
 	@echo " Linking... $(MAINOBJS)"
-	$(C) -T $(SRCDIR)/linker.ld $(MAINOBJS) -o $@ -ffreestanding -O2 -nostdlib -lgcc
+	$(C) -T build/linker.lds $(MAINOBJS) -o $@ -ffreestanding -O2 -nostdlib -lgcc
 
 bin/grub.cfg: $(SRCDIR)/grub.cfg
 	cp $(SRCDIR)/grub.cfg bin/grub.cfg
+
+$(BUILDDIR)/linker.lds: $(SRCDIR)/linker.lds.S
+	$(C) $(CFLAGS) $(INC) -E -P -o $@ -x c-header $^
 
 #Include dependencies which are created
 #-include $(DEPENDENCIES:)

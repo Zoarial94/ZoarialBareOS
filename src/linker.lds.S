@@ -1,3 +1,5 @@
+#include <arch/i686/memory.h>
+
 /* The bootloader will look at this image and start execution at the symbol
    designated as the entry point. */
 ENTRY(_start)
@@ -25,7 +27,7 @@ SECTIONS
 		*(.paging.setup.text)
 	}
 
-	. += 0xC0000000;
+	. += PAGE_OFFSET;
 
 	.text ALIGN(4K) : AT (ADDR (.text) - 0xC0000000)
 	{
