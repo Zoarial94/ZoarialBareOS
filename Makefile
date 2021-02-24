@@ -30,7 +30,7 @@ CPPSOURCES := $(shell find $(SRCDIR) -type f -name "*.$(CPPSRCEXT)")
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CSOURCES:.$(CSRCEXT)=.o)) $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CPPSOURCES:.$(CPPSRCEXT)=.o))
 
 #Get assembly source files and create objects from them 
-ASSOURCES := $(shell find $(SRCDIR) -type f -name "*.$(ASSRCEXT)")
+ASSOURCES := $(shell find $(SRCDIR) -name global-$(ARCH) -prune -false -o -type f -name "*.$(ASSRCEXT)" -print)
 ASOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(ASSOURCES:.$(ASSRCEXT)=.o))
 
 #Find dependencies from C and C++ source files
@@ -48,7 +48,7 @@ FLAGS := -O2 -Wall -Wextra -g -D__is_kernel -ffreestanding -fstack-protector
 #Specific flags
 CFLAGS := $(FLAGS) -std=gnu99 
 CXXFLAGS := $(FLAGS) -std=c++17
-ASFLAGS := 
+ASFLAGS := -g --gstabs+ --gdwarf-5
 
 #Make sure certain directories are made
 $(shell mkdir -p $(BUILDDIR) $(DEPDIR) bin/)
@@ -61,27 +61,28 @@ $(shell mkdir -p $(patsubst $(SRCDIR)/%, $(DEPDIR)/%, $(TREE)))
 GLOBALARCHDIR	:= $(BUILDDIR)/arch/global-$(ARCH)
 
 #Define/create the global constructor objects
-CRTBEGINOBJ := $($(C) $(CFLAGS) -print-file-name=crtbegin.o)
-CRTENDOBJ := $($(C) $(CFLAGS) -print-file-name=crtend.o)
+CRTBEGINOBJ := $(shell $(C) $(CFLAGS) -print-file-name=crtbegin.o)
+CRTENDOBJ := $(shell $(C) $(CFLAGS) -print-file-name=crtend.o)
 
 CRTBEGIN := $(GLOBALARCHDIR)/crti.o $(CRTBEGINOBJ)
 CRTEND := $(CRTENDOBJ) $(GLOBALARCHDIR)/crtn.o
+
+MAKEOBJS := $(GLOBALARCHDIR)/crti.o $(GLOBALARCHDIR)/crtn.o $(SRCDIR)/linker.ld $(OBJECTS) $(ASOBJECTS)
 
 #Order the objects to prevent weird gcc bugs with global constructors
 MAINOBJS := $(CRTBEGIN) $(OBJECTS) $(ASOBJECTS) $(CRTEND)
 
 #Compile Target
 bin/ZoarialBareOS.iso: bin/ZoarialBareOS.bin bin/grub.cfg
+	grub2-file --is-x86-multiboot bin/ZoarialBareOS.bin
+	mkdir -p $(BUILDDIR)/isodir/boot/grub
 	cp bin/ZoarialBareOS.bin $(BUILDDIR)/isodir/boot/
 	cp $(SRCDIR)/grub.cfg $(BUILDDIR)/isodir/boot/grub/grub.cfg
 	grub2-mkrescue -o $@ $(BUILDDIR)/isodir
 
-bin/ZoarialBareOS.bin: $(MAINOBJS)
+bin/ZoarialBareOS.bin: $(MAKEOBJS) 
 	@echo " Linking... $(MAINOBJS)"
-	$(C) -T $(SRCDIR)/linker.ld $^ -o $@ -ffreestanding -O2 -nostdlib -lgcc
-	grub2-file --is-x86-multiboot $@
-	mkdir -p $(BUILDDIR)/isodir/boot/grub
-
+	$(C) -T $(SRCDIR)/linker.ld $(MAINOBJS) -o $@ -ffreestanding -O2 -nostdlib -lgcc
 
 bin/grub.cfg: $(SRCDIR)/grub.cfg
 	cp $(SRCDIR)/grub.cfg bin/grub.cfg
