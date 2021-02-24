@@ -2,7 +2,7 @@
 ARCH ?= i686
 C := $(ARCH)-elf-gcc
 CXX := $(ARCH)-elf-g++
-AS := $(ARCH)-elf-as
+AS := $(ARCH)-elf-gcc
 
 #Separate out source directories for better compartmentalization
 SRCDIR 			:= src
@@ -21,7 +21,7 @@ CSRCEXT := c
 CINCEXT := h
 CPPSRCEXT := cpp
 CPPINCEXT := hpp
-ASSRCEXT := s
+ASSRCEXT := S
 
 #Locate C and C++ files
 CSOURCES := $(shell find $(SRCDIR) -type f -name "*.$(CSRCEXT)")
@@ -48,7 +48,7 @@ FLAGS := -O2 -Wall -Wextra -g -D__is_kernel -ffreestanding -fstack-protector
 #Specific flags
 CFLAGS := $(FLAGS) -std=gnu99 
 CXXFLAGS := $(FLAGS) -std=c++17
-ASFLAGS := -g --gstabs+ --gdwarf-5
+ASFLAGS := -c -g -gstabs+ 
 
 #Make sure certain directories are made
 $(shell mkdir -p $(BUILDDIR) $(DEPDIR) bin/)
@@ -146,7 +146,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(ASSRCEXT)
 	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(DEPDIR)
 #Compile object
-	$(AS) $(ASFLAGS) -o $@ $<
+	$(AS) $(ASFLAGS) $(INC) -o $@ $<
 
 #Clean
 clean:

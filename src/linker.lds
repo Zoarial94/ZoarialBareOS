@@ -16,38 +16,42 @@ SECTIONS
 	   early in the image or the bootloader won't recognize the file format.
 	   Next we'll put the .text section. */
 
-	_kernel_start = .;
+	_kernel_physical_start = .;
 	.multiboot.data ALIGN(4K) : 
 	{
 		*(.multiboot.data)
 	}
 
-	.paging.setup.text :
+	.paging.setup.text ALIGN(4K) :
 	{
 		*(.paging.setup.text)
 	}
+	_kernel_physical_end = .;
 
 	. += PAGE_OFFSET;
+	_kernel_virtual_start = .;
 
-	.text ALIGN(4K) : AT (ADDR (.text) - 0xC0000000)
+	.text ALIGN(4K) : AT (ADDR (.text) - PAGE_OFFSET)
 	{
 		*(.text)
 	}
 
 	/* Read-only data. */
-	.rodata ALIGN(4K) : AT (ADDR (.rodata) - 0xC0000000)
+	.rodata ALIGN(4K) : AT (ADDR (.rodata) - PAGE_OFFSET)
 	{
 		*(.rodata)
 	}
  
+	. = ALIGN(4K);
+	_kernel_rw_start = .;
 	/* Read-write data (initialized) */
-	.data ALIGN(4K) : AT (ADDR (.data) - 0xC0000000)
+	.data ALIGN(4K) : AT (ADDR (.data) - PAGE_OFFSET)
 	{
 		*(.data)
 	}
  
 	/* Read-write data (uninitialized) and stack */
-	.bss ALIGN(4K) : AT (ADDR (.bss) - 0xC0000000)
+	.bss ALIGN(4K) : AT (ADDR (.bss) - PAGE_OFFSET)
 	{
 		*(COMMON)
 		*(.bss)
