@@ -39,7 +39,7 @@ SECTIONS
 	/* Read-only data. */
 	.rodata ALIGN(4K) : AT (ADDR (.rodata) - PAGE_OFFSET)
 	{
-		*(.rodata)
+		*(.rodata*)
 	}
  
 	. = ALIGN(4K);

@@ -76,28 +76,47 @@ _start:
 	itself. It has absolute and complete power over the
 	machine.
 	*/
-	movl $(PAGE_OFFSET), %ebx
+
 	# Physical address of boot_page_table1.
 	movl $(boot_page_table1 - PAGE_OFFSET), %edi
+
+	# Jump to the correct position on boot_page_table
+	xor %edx, %edx
+	movl $(_kernel_physical_start), %eax
+	# Divide by 1024 b/c 4096 bytes per page, but each page is 4 bytes long
+	movl $1024, %ebx
+	div %ebx
+	addl %eax, %edi
 	# First address to map is address 0.
-	movl $0, %esi
+	movl $_kernel_physical_start, %esi
 	# Map 1023 pages. The 1024th will be the VGA text buffer.
 	movl $1023, %ecx
 
 1:
 	# Only map the kernel.
 	cmpl $(_kernel_physical_start), %esi
-	jl 2f
+	jl inc_next_page
+	cmpl $(_kernel_rw_start - PAGE_OFFSET), %esi
+	jl write_ro_page 
 	cmpl $(_kernel_end - PAGE_OFFSET), %esi
+	jle write_rw_page
 	jge 3f
 
+write_rw_page:
 	# Map physical address as "present, writable". Note that this maps
 	# .text and .rodata as writable. Mind security and map them as non-writable.
 	movl %esi, %edx
 	orl $0x003, %edx
 	movl %edx, (%edi)
+	jmp inc_next_page
 
-2:
+write_ro_page:
+	movl %esi, %edx
+	orl $0x001, %edx
+	movl %edx, (%edi)
+	jmp inc_next_page
+
+inc_next_page:
 	# Size of page is 4096 bytes.
 	addl $4096, %esi
 	# Size of entries in boot_page_table1 is 4 bytes.
