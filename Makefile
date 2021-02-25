@@ -48,7 +48,7 @@ FLAGS := -O2 -Wall -Wextra -g -D__is_kernel -ffreestanding -fstack-protector
 #Specific flags
 CFLAGS := $(FLAGS) -std=gnu99 
 CXXFLAGS := $(FLAGS) -std=c++17
-ASFLAGS := -c -g -gstabs+ 
+ASFLAGS := -c -g -gdwarf-5 
 
 #Make sure certain directories are made
 $(shell mkdir -p $(BUILDDIR) $(DEPDIR) bin/)
