@@ -54,6 +54,9 @@ boot_page_directory:
 	.skip 4096
 boot_page_table1:
 	.skip 4096
+.global gd_table
+gd_table:
+	.skip GDT_SIZE * 8
  
 /*
 The linker script specifies _start as the entry point to the kernel and the
@@ -82,7 +85,7 @@ _start:
 
 	# Jump to the correct position on boot_page_table
 	xor %edx, %edx
-	movl $(_kernel_physical_start), %eax
+	movl $_kernel_physical_start, %eax
 	# Divide by 1024 b/c 4096 bytes per page, but each page is 4 bytes long
 	movl $1024, %ebx
 	div %ebx

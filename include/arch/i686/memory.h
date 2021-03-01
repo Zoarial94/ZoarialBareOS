@@ -1,1 +1,10 @@
+#ifndef MEMORY_H
+#define MEMORY_H
+
+// Kernel lives in top 1GB 
 #define PAGE_OFFSET 0xC0000000
+// Allow 16 entries into the GDT
+// 4 entires for ring 0/3 and 12 for TSS
+#define GDT_SIZE 16
+
+#endif

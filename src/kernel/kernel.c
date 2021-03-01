@@ -1,3 +1,5 @@
+#include <arch/i686/gdt.h>
+
 #include <kernel/tty.h>
 #include <stdbool.h>
  
@@ -14,6 +16,10 @@
 
 void kernel_main(void) 
 {
+
+	/* Initialize architechure specific features/attribtes */
+	GDT_initialize();
+
 	/* Initialize terminal interface */
 	terminal_initialize();
  
