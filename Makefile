@@ -27,11 +27,11 @@ ASSRCEXT := S
 CSOURCES := $(shell find $(SRCDIR) -type f -name "*.$(CSRCEXT)")
 CPPSOURCES := $(shell find $(SRCDIR) -type f -name "*.$(CPPSRCEXT)")
 #Get object files from C and C++ source files 
-OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CSOURCES:.$(CSRCEXT)=.o)) $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CPPSOURCES:.$(CPPSRCEXT)=.o))
+OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CSOURCES:.$(CSRCEXT)=.$(CSRCEXT).o)) $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CPPSOURCES:.$(CPPSRCEXT)=.$(CPPSRCEXT).o))
 
 #Get assembly source files and create objects from them 
 ASSOURCES := $(shell find $(SRCDIR) -name global-$(ARCH) -prune -false -o -type f -name "*.$(ASSRCEXT)" -print)
-ASOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(ASSOURCES:.$(ASSRCEXT)=.o))
+ASOBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(ASSOURCES:.$(ASSRCEXT)=.$(ASSRCEXT).o))
 
 #Find dependencies from C and C++ source files
 DEPENDENCIES := $(patsubst $(SRCDIR)/%,$(DEPDIR)/%,$(CSOURCES:.$(CSRCEXT)=.d))
@@ -64,15 +64,15 @@ GLOBALARCHDIR	:= $(BUILDDIR)/arch/global-$(ARCH)
 CRTBEGINOBJ := $(shell $(C) $(CFLAGS) -print-file-name=crtbegin.o)
 CRTENDOBJ := $(shell $(C) $(CFLAGS) -print-file-name=crtend.o)
 
-CRTBEGIN := $(GLOBALARCHDIR)/crti.o $(CRTBEGINOBJ)
-CRTEND := $(CRTENDOBJ) $(GLOBALARCHDIR)/crtn.o
+CRTBEGIN := $(GLOBALARCHDIR)/crti.S.o $(CRTBEGINOBJ)
+CRTEND := $(CRTENDOBJ) $(GLOBALARCHDIR)/crtn.S.o
 
 LINKERFILE := $(SRCDIR)/linker.lds
 
-MAKEOBJS := $(GLOBALARCHDIR)/crti.o $(GLOBALARCHDIR)/crtn.o $(BUILDDIR)/linker.lds $(OBJECTS) $(ASOBJECTS)
+MAKEOBJS := $(GLOBALARCHDIR)/crti.S.o $(GLOBALARCHDIR)/crtn.S.o $(BUILDDIR)/linker.lds $(OBJECTS) $(ASOBJECTS)
 
 #Order the objects to prevent weird gcc bugs with global constructors
-MAINOBJS := $(CRTBEGIN) $(OBJECTS) $(ASOBJECTS) $(CRTEND)
+MAINOBJS := $(CRTBEGIN) $(ASOBJECTS) $(OBJECTS) $(CRTEND)
 
 #Compile Target
 bin/ZoarialBareOS.iso: bin/ZoarialBareOS.bin bin/grub.cfg
@@ -83,7 +83,6 @@ bin/ZoarialBareOS.iso: bin/ZoarialBareOS.bin bin/grub.cfg
 	grub2-mkrescue -o $@ $(BUILDDIR)/isodir
 
 bin/ZoarialBareOS.bin: $(MAKEOBJS) 
-	@echo " Linking... $(MAINOBJS)"
 	$(C) -T build/linker.lds $(MAINOBJS) -o $@ -ffreestanding -O2 -nostdlib -lgcc
 
 bin/grub.cfg: $(SRCDIR)/grub.cfg
@@ -97,7 +96,7 @@ $(BUILDDIR)/linker.lds: $(LINKERFILE)
 include $(wildcard $(DEPENDENCIES))
 
 #Create C++ object files
-$(BUILDDIR)/%.o: $(SRCDIR)/%.$(CPPSRCEXT)
+$(BUILDDIR)/%.$(CPPSRCEXT).o: $(SRCDIR)/%.$(CPPSRCEXT)
 #Make build directory
 	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(DEPDIR)
@@ -119,7 +118,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(CPPSRCEXT)
 	@rm -f $(DEPDIR)/$*.d.tmp
 		
 #Create C object files
-$(BUILDDIR)/%.o: $(SRCDIR)/%.$(CSRCEXT)
+$(BUILDDIR)/%.$(CSRCEXT).o: $(SRCDIR)/%.$(CSRCEXT)
 #Make build directory
 	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(DEPDIR)
@@ -141,7 +140,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(CSRCEXT)
 	@rm -f $(DEPDIR)/$*.d.tmp
 
 #Create object files
-$(BUILDDIR)/%.o: $(SRCDIR)/%.$(ASSRCEXT)
+$(BUILDDIR)/%.$(ASSRCEXT).o: $(SRCDIR)/%.$(ASSRCEXT)
 #Make build directory
 	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(DEPDIR)
