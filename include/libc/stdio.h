@@ -8,6 +8,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+static const char digits[] = "0123456789abcdef";
  
 int printf(const char* __restrict, ...);
 int putchar(int);

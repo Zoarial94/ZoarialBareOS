@@ -3,13 +3,30 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
- 
+
+#define MAXBUF 256
+
 static bool print(const char* data, size_t length) {
 	const unsigned char* bytes = (const unsigned char*) data;
 	for (size_t i = 0; i < length; i++)
 		if (putchar(bytes[i]) == EOF)
 			return false;
 	return true;
+}
+
+static unsigned int printnum( unsigned int u, int base) {
+	char buf[MAXBUF];
+	int i =  0;
+	do {
+		buf[i++] = digits[u % base];
+		u /= base;
+
+	} while(u != 0 && i != MAXBUF);
+	unsigned int written = i;
+	for(i--; i >= 0; i--) {
+		putchar(buf[i]);
+	}
+	return written;
 }
  
 int printf(const char* restrict format, ...) {
@@ -61,6 +78,14 @@ int printf(const char* restrict format, ...) {
 			if (!print(str, len))
 				return -1;
 			written += len;
+		} else if (*format == 'd') {
+			format++;
+			unsigned long i = va_arg(parameters, long);
+			printnum(i, 10);
+		} else if (*format == 'x') {
+			format++;
+			unsigned long i = va_arg(parameters, long);
+			printnum(i, 16);
 		} else {
 			format = format_begun_at;
 			size_t len = strlen(format);
