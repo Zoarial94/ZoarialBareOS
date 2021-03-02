@@ -230,9 +230,11 @@ struct multiboot_color
 struct multiboot_mmap_entry
 {
   multiboot_uint32_t size;
-  //TODO: Change these back to uint64_t for long mode
-  multiboot_uint32_t addr;
-  multiboot_uint32_t len;
+  // GCC is broken and won't obey the packed attribute
+  multiboot_uint32_t addr_low;
+  multiboot_uint32_t addr_high;
+  multiboot_uint32_t len_low;
+  multiboot_uint32_t len_high;
 #define MULTIBOOT_MEMORY_AVAILABLE              1
 #define MULTIBOOT_MEMORY_RESERVED               2
 #define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE       3

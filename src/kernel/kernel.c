@@ -15,6 +15,8 @@
 #error "This tutorial needs to be compiled with a ix86-elf compiler"
 #endif
 
+extern multiboot_info_t _kernel_physical_memmap;
+
 
 void kernel_main(multiboot_info_t* mbt, unsigned int magic) 
 {
@@ -31,16 +33,26 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
 	printf("Printing 12345: %d\n", 12345);
 	printf("Printing 0xdeadbeef: 0x%x\n", 0xdeadbeef);
 	printf("Magic is: 0x%x\n", magic);
-	printf("At address: 0x%x\n", mbt);
-	// printf("Memory Map Length: 0x%x\n", mbt->mmap_length);
+	const int memmap_offset = (int)&_kernel_physical_memmap - (int)mbt;
+	printf("At physical address: 0x%x\n", mbt);
+	mbt = &_kernel_physical_memmap;
+	printf("At virtual address: 0x%x\n", mbt);
+	printf("Offset: 0x%x\n", memmap_offset);
+	printf("Memory Map Length: 0x%x\n", mbt->mmap_length);
 
 	typedef multiboot_memory_map_t mmap_entry_t;
-	/*
-	mmap_entry_t* entry = mbt->mmap_addr;
-	while(entry < mbt->mmap_addr + mbt->mmap_length) {
+	
+	mmap_entry_t* entry = (mmap_entry_t*)(mbt->mmap_addr);
+	printf("Entry physical address at: 0x%x\n", entry);
+	printf("Entry virtual address at: 0x%x\n", ((unsigned int)entry + memmap_offset));
+	entry = (void*)((unsigned int)entry + memmap_offset);
+	printf("Entry virtual address at: 0x%x\n", entry);
+
+	while(entry < (mmap_entry_t*)((mbt->mmap_addr + memmap_offset) + mbt->mmap_length)) {
 		// do something with the entry
-		printf("Size: 0x%x, Addr:0x%x, Len:0x%x Type:%d\n", entry->size, entry->addr, entry->len, entry->type);
+		printf("Addr:0x%x%x, Len:0x%x%x Type:%d\n", entry->addr_high, entry->addr_low, entry->len_high, entry->len_low, entry->type);
 		entry = (mmap_entry_t*) ((unsigned int) entry + entry->size + sizeof(entry->size));
 	}
-	*/
+	
+	
 }

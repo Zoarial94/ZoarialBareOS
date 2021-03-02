@@ -60,11 +60,9 @@ gd_table:
 	.skip GDT_SIZE * 8
 id_table:
 	.skip IDT_SIZE * 8
-multiboot_save:
-	.skip 8
 
 .section .grub_memory_map, "a", @nobits
-	.align 4096
+	.skip 512
 
 /*
 The linker script specifies _start as the entry point to the kernel and the
@@ -93,9 +91,6 @@ _start:
 	push %eax
 	push %ebx
 
-	mov %eax, multiboot_save
-	mov %ebx, multiboot_save+4
-
 	# Physical address of boot_page_table1.
 	movl $(boot_page_table1 - PAGE_OFFSET), %edi
 
@@ -113,6 +108,8 @@ _start:
 
 1:
 	# Only map the kernel.
+	cmpl $(_kernel_physical_memmap - PAGE_OFFSET), %esi
+	je memmap_page
 	cmpl $(_kernel_physical_start), %esi
 	jl inc_next_page
 	cmpl $(_kernel_rw_start - PAGE_OFFSET), %esi
@@ -131,6 +128,12 @@ write_rw_page:
 
 write_ro_page:
 	movl %esi, %edx
+	orl $0x001, %edx
+	movl %edx, (%edi)
+	jmp inc_next_page
+
+memmap_page:
+	movl $0x10000, %edx
 	orl $0x001, %edx
 	movl %edx, (%edi)
 	jmp inc_next_page
