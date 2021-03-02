@@ -40,6 +40,7 @@ SECTIONS
 	.rodata ALIGN(4K) : AT (ADDR (.rodata) - PAGE_OFFSET)
 	{
 		*(.rodata*)
+		*(.grub_memory_map)
 	}
  
 	. = ALIGN(4K);

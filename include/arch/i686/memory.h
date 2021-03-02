@@ -6,5 +6,6 @@
 // Allow 16 entries into the GDT
 // 4 entires for ring 0/3 and 12 for TSS
 #define GDT_SIZE 16
+#define IDT_SIZE 256
 
 #endif

@@ -25,7 +25,7 @@ extern void reloadSegments();
 void GDT_add_descriptor(uint32_t base, uint32_t limit, uint16_t type) {
     static int GDT_pos = 0;
 
-    uint64_t *descriptor = &gd_table + (GDT_pos); 
+    uint64_t *descriptor = &gd_table + GDT_pos; 
 
     // Create the high 32 bit segment
     *descriptor  =  limit       & 0x000F0000;         // set limit bits 19:16

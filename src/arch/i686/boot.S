@@ -48,16 +48,24 @@ Preallocate pages used for paging. Don't hard-code addresses and assume they
 are available, as the bootloader might have loaded its multiboot structures or
 modules there. This lets the bootloader know it must avoid the addresses.
 */
+.global gd_table
+
 .section .bss, "aw", @nobits
 	.align 4096
 boot_page_directory:
 	.skip 4096
 boot_page_table1:
 	.skip 4096
-.global gd_table
 gd_table:
 	.skip GDT_SIZE * 8
- 
+id_table:
+	.skip IDT_SIZE * 8
+multiboot_save:
+	.skip 8
+
+.section .grub_memory_map, "a", @nobits
+	.align 4096
+
 /*
 The linker script specifies _start as the entry point to the kernel and the
 bootloader will jump to this position once the kernel has been loaded. It
@@ -79,6 +87,14 @@ _start:
 	itself. It has absolute and complete power over the
 	machine.
 	*/
+	
+	# Save multiboot magic number and memory map pointer
+	mov $(stack_top - PAGE_OFFSET), %esp
+	push %eax
+	push %ebx
+
+	mov %eax, multiboot_save
+	mov %ebx, multiboot_save+4
 
 	# Physical address of boot_page_table1.
 	movl $(boot_page_table1 - PAGE_OFFSET), %edi
@@ -90,7 +106,7 @@ _start:
 	movl $1024, %ebx
 	div %ebx
 	addl %eax, %edi
-	# First address to map is address 0.
+	# First address to map is the kernel start
 	movl $_kernel_physical_start, %esi
 	# Map 1023 pages. The 1024th will be the VGA text buffer.
 	movl $1023, %ecx
@@ -147,7 +163,7 @@ inc_next_page:
 	movl %ecx, %cr3
 
 	# Enable paging and the write-protect bit.
-	movl %cr0, %ecx
+movl %cr0, %ecx
 	orl $0x80010000, %ecx
 	movl %ecx, %cr0
 
@@ -172,7 +188,12 @@ inc_next_page:
 	stack (as it grows downwards on x86 systems). This is necessarily done
 	in assembly as languages such as C cannot function without a stack.
 	*/
-	mov $stack_top, %esp
+	/*
+	Add PAGE_OFFSET because the stack is already setup, 
+	but needs to be translated to the virtual memory space
+	*/
+	addl $PAGE_OFFSET, %esp
+	# mov $stack_top, %esp
  
 	/*
 	This is a good place to initialize crucial processor state before the
