@@ -33,7 +33,7 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
 	printf("Printing 12345: %d\n", 12345);
 	printf("Printing 0xdeadbeef: 0x%x\n", 0xdeadbeef);
 	printf("Magic is: 0x%x\n", magic);
-	const int memmap_offset = (int)&_kernel_physical_memmap - (int)mbt;
+	const unsigned int memmap_offset = (unsigned int)&_kernel_physical_memmap - (unsigned int)mbt;
 	printf("At physical address: 0x%x\n", mbt);
 	mbt = &_kernel_physical_memmap;
 	printf("At virtual address: 0x%x\n", mbt);
@@ -45,12 +45,16 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
 	mmap_entry_t* entry = (mmap_entry_t*)(mbt->mmap_addr);
 	printf("Entry physical address at: 0x%x\n", entry);
 	printf("Entry virtual address at: 0x%x\n", ((unsigned int)entry + memmap_offset));
-	entry = (void*)((unsigned int)entry + memmap_offset);
+	entry = (mmap_entry_t*)((unsigned int)entry + memmap_offset);
 	printf("Entry virtual address at: 0x%x\n", entry);
 
 	while(entry < (mmap_entry_t*)((mbt->mmap_addr + memmap_offset) + mbt->mmap_length)) {
 		// do something with the entry
-		printf("Addr:0x%x%x, Len:0x%x%x Type:%d\n", entry->addr_high, entry->addr_low, entry->len_high, entry->len_low, entry->type);
+		uint64_t addr = (uint64_t)entry->addr_low | (uint64_t)entry->addr_high << 32;
+		uint64_t len = (uint64_t)entry->len_low | (uint64_t)entry->len_high << 32;
+		printf("Addr:0x%lx, Len:0x%lx Type:%d\n", addr, len, entry->len_high, entry->len_low, entry->type);
+
+
 		entry = (mmap_entry_t*) ((unsigned int) entry + entry->size + sizeof(entry->size));
 	}
 	

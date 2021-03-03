@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 #define MAXBUF 256
 
@@ -78,6 +79,28 @@ int printf(const char* restrict format, ...) {
 			if (!print(str, len))
 				return -1;
 			written += len;
+		} else if (*format == 'l') {
+			format++;
+			if (*format == 'd') {
+				format++;
+				unsigned long i = va_arg(parameters, uint64_t);
+				written += printnum(i, 10);
+			} else if (*format == 'x') {
+				format++;
+				unsigned long i = va_arg(parameters, uint64_t);
+				written += printnum(i, 16);
+			} else {
+				format = format_begun_at;
+				size_t len = strlen(format);
+				if (maxrem < len) {
+					// TODO: Set errno to EOVERFLOW.
+					return -1;
+				}
+				if (!print(format, len))
+					return -1;
+				written += len;
+				format += len;
+			}
 		} else if (*format == 'd') {
 			format++;
 			unsigned long i = va_arg(parameters, long);

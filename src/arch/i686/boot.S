@@ -133,7 +133,10 @@ write_ro_page:
 	jmp inc_next_page
 
 memmap_page:
-	movl $0x10000, %edx
+	# The grub memory map pointer is on the stack
+	movl (%esp), %edx
+	and $0xFFFFF000, %edx
+	# movl $0x10000, %edx
 	orl $0x001, %edx
 	movl %edx, (%edi)
 	jmp inc_next_page
