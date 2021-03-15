@@ -4,6 +4,8 @@ build/
 tmp/
 .vscode/
 
+*.core
+
 # ---> C++
 # Compiled Object files
 *.slo
