@@ -1,5 +1,6 @@
 #include <arch/i686/gdt.h>
 #include <arch/i686/idt.h>
+#include <arch/i686/pic.h>
 
 #include <kernel/tty.h>
 #include <stdbool.h>
@@ -27,13 +28,15 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
 
 	IDT_initialize();
 
+    PIC_initialize();
+
 	//TODO: research and create LDT
 	//LDT_initialize();
 
 	/* Initialize terminal interface */
 	terminal_initialize();
 	
-	terminal_writestring("Hello, kernel World!\nHello again!! And one more time!\n");
+	terminal_writestring("Hello, kernel World! (IDT) \nHello again!! And one more time!\n");
 
 	printf("Printing 12345: %d\n", 12345);
 	printf("Printing 0xdeadbeef: 0x%x\n", 0xdeadbeef);
@@ -63,5 +66,8 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
 		entry = (mmap_entry_t*) ((unsigned int) entry + entry->size + sizeof(entry->size));
 	}
 	
+    printf("PIC Masks: 0x%x\n", PIC_get_mask());
+    PIC_set_mask(0xFFFF);
+    printf("PIC Masks: 0x%x\n", PIC_get_mask());
 	
 }

@@ -11,4 +11,5 @@ void IDT_add_descriptor(void) {
 
 void IDT_initialize(void) {
 
+    setIdt(&id_table, IDT_SIZE*8);
 }
