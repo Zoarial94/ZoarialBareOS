@@ -10,6 +10,7 @@ setGdt:
      movl 4(%esp), %eax
      movl %eax, (gdtr + 2)
      movw 8(%esp), %ax
+     dec %ax # sub one per GDT standard
      movw %ax, gdtr
      lgdt gdtr
      ret

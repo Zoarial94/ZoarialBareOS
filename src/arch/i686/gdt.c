@@ -1,5 +1,6 @@
 #include <arch/i686/gdt.h>
 #include <arch/i686/memory.h>
+#include <kernel/panic.h>
 
 #define GDT_CODE_PL0 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
@@ -24,6 +25,10 @@ extern void reloadSegments();
 
 void GDT_add_descriptor(uint32_t base, uint32_t limit, uint16_t type) {
     static int GDT_pos = 0;
+
+    if(GDT_pos - 1 >= GDT_SIZE) {
+        panic("Not enough space in GDT for another descriptor!");
+    }
 
     uint64_t *descriptor = &gd_table + GDT_pos; 
 

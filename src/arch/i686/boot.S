@@ -49,6 +49,8 @@ are available, as the bootloader might have loaded its multiboot structures or
 modules there. This lets the bootloader know it must avoid the addresses.
 */
 .global gd_table
+.global id_table
+.global ld_table
 
 .section .bss, "aw", @nobits
 	.align 4096
@@ -60,6 +62,8 @@ gd_table:
 	.skip GDT_SIZE * 8
 id_table:
 	.skip IDT_SIZE * 8
+ld_table:
+	.skip LDT_SIZE * 8
 
 .section .grub_memory_map, "a", @nobits
 	.skip 512

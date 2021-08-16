@@ -1,4 +1,5 @@
 #include <arch/i686/gdt.h>
+#include <arch/i686/idt.h>
 
 #include <kernel/tty.h>
 #include <stdbool.h>
@@ -24,10 +25,14 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
 	/* Initialize architechure specific features/attribtes */
 	GDT_initialize();
 
+	IDT_initialize();
+
+	//TODO: research and create LDT
+	//LDT_initialize();
+
 	/* Initialize terminal interface */
 	terminal_initialize();
 	
-	/* Newline support is left as an exercise. */
 	terminal_writestring("Hello, kernel World!\nHello again!! And one more time!\n");
 
 	printf("Printing 12345: %d\n", 12345);
