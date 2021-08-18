@@ -2,6 +2,8 @@
 #include <arch/i686/idt.h>
 #include <arch/i686/pic.h>
 
+#include <arch/i686/driver/PS2/ps2.h>
+
 #include <kernel/tty.h>
 #include <stdbool.h>
 #include <multiboot/multiboot.h>
@@ -70,4 +72,6 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
     PIC_set_mask(0xFFFF);
     printf("PIC Masks: 0x%x\n", PIC_get_mask());
 	
+    PS2_driver_initialize();
+
 }
