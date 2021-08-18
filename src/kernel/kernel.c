@@ -42,11 +42,11 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
 	printf("Printing 0xdeadbeef: 0x%x\n", 0xdeadbeef);
 	printf("Magic is: 0x%x\n", magic);
 	const unsigned int memmap_offset = (unsigned int)&_kernel_physical_memmap - (unsigned int)mbt;
-	printf("At physical address: 0x%x\n", mbt);
+	printf("Multiboot info physical address: 0x%x\n", mbt);
 	mbt = &_kernel_physical_memmap;
-	printf("At virtual address: 0x%x\n", mbt);
+	printf("Multiboot info virtual address: 0x%x\n", mbt);
 	printf("Offset: 0x%x\n", memmap_offset);
-	printf("Memory Map Length: 0x%x\n", mbt->mmap_length);
+	printf("\nMultiboot Memory Map Length: 0x%x\n", mbt->mmap_length);
 
 	typedef multiboot_memory_map_t mmap_entry_t;
 	

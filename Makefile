@@ -48,7 +48,7 @@ FLAGS := -O2 -Wall -Wextra -g -D__is_kernel -D__is_libk -ffreestanding -fstack-p
 #Specific flags
 CFLAGS := $(FLAGS) -std=gnu99 
 CXXFLAGS := $(FLAGS) -std=c++17
-ASFLAGS := -c -g -gdwarf-5 
+ASFLAGS := -c -g #-gdwarf-5 
 
 #Make sure certain directories are made
 $(shell mkdir -p $(BUILDDIR) $(DEPDIR) bin/)
@@ -82,7 +82,7 @@ bin/ZoarialBareOS.iso: bin/ZoarialBareOS.bin bin/grub.cfg
 	cp $(SRCDIR)/grub.cfg $(BUILDDIR)/isodir/boot/grub/grub.cfg
 	grub2-mkrescue -o $@ $(BUILDDIR)/isodir
 
-bin/ZoarialBareOS.bin: $(MAKEOBJS) 
+bin/ZoarialBareOS.bin: $(MAKEOBJS) Makefile
 	$(C) -T build/linker.lds $(MAINOBJS) -o $@ -ffreestanding -O2 -nostdlib -lgcc
 
 bin/grub.cfg: $(SRCDIR)/grub.cfg
@@ -96,7 +96,7 @@ $(BUILDDIR)/linker.lds: $(LINKERFILE)
 include $(wildcard $(DEPENDENCIES))
 
 #Create C++ object files
-$(BUILDDIR)/%.$(CPPSRCEXT).o: $(SRCDIR)/%.$(CPPSRCEXT)
+$(BUILDDIR)/%.$(CPPSRCEXT).o: $(SRCDIR)/%.$(CPPSRCEXT) Makefile
 #Make build directory
 	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(DEPDIR)
@@ -118,7 +118,7 @@ $(BUILDDIR)/%.$(CPPSRCEXT).o: $(SRCDIR)/%.$(CPPSRCEXT)
 	@rm -f $(DEPDIR)/$*.d.tmp
 		
 #Create C object files
-$(BUILDDIR)/%.$(CSRCEXT).o: $(SRCDIR)/%.$(CSRCEXT)
+$(BUILDDIR)/%.$(CSRCEXT).o: $(SRCDIR)/%.$(CSRCEXT) Makefile
 #Make build directory
 	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(DEPDIR)
@@ -140,7 +140,7 @@ $(BUILDDIR)/%.$(CSRCEXT).o: $(SRCDIR)/%.$(CSRCEXT)
 	@rm -f $(DEPDIR)/$*.d.tmp
 
 #Create object files
-$(BUILDDIR)/%.$(ASSRCEXT).o: $(SRCDIR)/%.$(ASSRCEXT)
+$(BUILDDIR)/%.$(ASSRCEXT).o: $(SRCDIR)/%.$(ASSRCEXT) Makefile
 #Make build directory
 	@mkdir -p $(BUILDDIR)
 	@mkdir -p $(DEPDIR)

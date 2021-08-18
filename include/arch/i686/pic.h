@@ -34,7 +34,7 @@ void PIC_remap(uint32_t offset1, uint32_t offset2);
 void IRQ_set_mask(uint8_t IRQLine);
 void IRQ_clear_mask(uint8_t IRQLine);
 
-static uint16_t PIC_get_irq_reg(uint32_t ocw3);
+uint16_t PIC_get_irq_reg(uint32_t ocw3);
 uint16_t PIC_get_irr(void);
 uint16_t PIC_get_isr(void);
 
@@ -42,5 +42,8 @@ uint16_t PIC_get_mask(void);
 void PIC_set_mask(uint16_t mask);
 
 void PIC_initialize(void);
+
+#define PS2_PORT1_IRQ (1 << 1)
+#define PS2_PORT2_IRQ (1 << 12)
 
 #endif
