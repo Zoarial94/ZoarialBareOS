@@ -4,12 +4,12 @@
 #define PS2_STATUS_REGISTER 0x64
 #define PS2_COMMAND_REGISTER 0x64
 
-#define STATUS_OUTPUT       0x01
-#define STATUS_INPUT        0x02
-#define STATUS_SYSTEM       0x04
-#define STATUS_COMMAND_TYPE 0x08
-#define STATUS_TIMEOUT      0x40
-#define STATUS_PARITY       0x80
+#define PS2_STATUS_OUTPUT       0x01
+#define PS2_STATUS_INPUT        0x02
+#define PS2_STATUS_SYSTEM       0x04
+#define PS2_STATUS_COMMAND_TYPE 0x08
+#define PS2_STATUS_TIMEOUT      0x40
+#define PS2_STATUS_PARITY       0x80
 
 /* COMMANDS */
 
@@ -25,6 +25,9 @@
 #define CMD_WRITE_CTRL_OUTPUT_PORT   0xD1
 
 #define CMD_CTRL_SELF_TEST  0xAA
+#define CTRL_SELF_TEST_OK   0x55
+#define CTRL_SELF_TEST_FAIL 0xFC
+
 #define CMD_PORT1_SELF_TEST 0xAB
 #define CMD_PORT2_SELF_TEST 0xA9
 
