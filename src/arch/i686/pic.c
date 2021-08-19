@@ -84,6 +84,7 @@ void PIC_set_mask(uint16_t mask) {
 
 void PIC_initialize(void) {
     
-    PIC_remap(PIC1, PIC2);
+    // Hard code to the beginning of the free interrupt range
+    PIC_remap(0x20, 0x28);
 
 }
