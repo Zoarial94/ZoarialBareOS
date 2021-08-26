@@ -241,7 +241,8 @@ movl %cr0, %ecx
 	3) Jump to the hlt instruction if it ever wakes up due to a
 	   non-maskable interrupt occurring or due to system management mode.
 	*/
-	cli
+	//cli
+    sti
 1:	hlt
 	jmp 1b
  

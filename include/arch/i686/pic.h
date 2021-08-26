@@ -26,6 +26,9 @@
 #define PIC2_COMMAND 	PIC2
 #define PIC2_DATA		(PIC2+1)
 
+#define PIC1_INT        0x20
+#define PIC2_INT        0x28
+
 #define PIC_EOI 0x20 	/* End of command */
 
 void PIC_sendEOI(uint8_t irq);

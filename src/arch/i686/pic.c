@@ -82,9 +82,17 @@ void PIC_set_mask(uint16_t mask) {
     outb(PIC2_DATA, (uint8_t) (mask >> 8));
 }
 
+void PIC_sendEOI(uint8_t irq) {
+    if(irq >= 8) {
+		outb(PIC2_COMMAND,PIC_EOI);
+    }
+	outb(PIC1_COMMAND,PIC_EOI);
+
+}
+
 void PIC_initialize(void) {
     
     // Hard code to the beginning of the free interrupt range
-    PIC_remap(0x20, 0x28);
+    PIC_remap(PIC1_INT, PIC2_INT);
 
 }

@@ -74,4 +74,5 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
 	
     PS2_driver_initialize();
 
+    printf("PIC Masks: 0x%x\n", PIC_get_mask());
 }
