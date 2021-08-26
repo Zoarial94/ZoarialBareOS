@@ -167,6 +167,10 @@ uint8_t PS2_driver_initialize(void) {
     PS2_disable_devices();
     printf("done\n");
 
+    while(PS2_poll_read_status()) {
+        PS2_data_read();
+    }
+
     PS2_controller_write(CMD_READ_CTRL_CONF);
     PS2_wait_on_read_status();
     controller_conf = PS2_data_read();
@@ -218,7 +222,7 @@ uint8_t PS2_driver_initialize(void) {
             puts("Controller Self Test has failed");
             return 0;
         default:
-            printf("Controller Self Test failed with code: 0x%x", ret_status);
+            printf("Controller Self Test failed with code: 0x%x\n", ret_status);
     }
 
     /*

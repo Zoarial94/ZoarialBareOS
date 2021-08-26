@@ -8,6 +8,8 @@
 #include <stdbool.h>
 #include <multiboot/multiboot.h>
 #include <stdio.h>
+
+#include <arch/i686/inline-asm.h>
  
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)
@@ -75,4 +77,11 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
     PS2_driver_initialize();
 
     printf("PIC Masks: 0x%x\n", PIC_get_mask());
+
+    enable_interrupts();
+    while(1) {
+        halt();
+        puts("Interrupt occured.");
+    }
+
 }

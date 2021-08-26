@@ -44,7 +44,7 @@ LIBDIR :=
 INC := -I include/ -I include/libc/ -I include/ACPICA
 
 #Combined flags (Both C and C++)
-FLAGS := -O2 -Wall -Wextra -g -D__is_kernel -D__is_libk -ffreestanding -fstack-protector
+FLAGS := -O3 -Werror -Wall -Wextra -Wpedantic -g -D__is_kernel -D__is_libk -ffreestanding -fstack-protector
 #Specific flags
 CFLAGS := $(FLAGS) -std=gnu99 
 CXXFLAGS := $(FLAGS) -std=c++17
