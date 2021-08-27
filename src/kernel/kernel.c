@@ -60,11 +60,10 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
 	entry = (mmap_entry_t*)((unsigned int)entry + memmap_offset);
 	printf("Entry virtual address at: 0x%x\n", entry);
 
+    puts("addr and len as 64-bit integers:");
 	while(entry < (mmap_entry_t*)((mbt->mmap_addr + memmap_offset) + mbt->mmap_length)) {
 		// do something with the entry
-		uint64_t addr = (uint64_t)entry->addr_low | (uint64_t)entry->addr_high << 32;
-		uint64_t len = (uint64_t)entry->len_low | (uint64_t)entry->len_high << 32;
-		printf("Addr:0x%lx, Len:0x%lx Type:%d\n", addr, len, entry->len_high, entry->len_low, entry->type);
+		printf("Addr:0x%lx, Len:0x%lx Type:%d\n", entry->addr, entry->len, entry->type);
 
 
 		entry = (mmap_entry_t*) ((unsigned int) entry + entry->size + sizeof(entry->size));
@@ -81,7 +80,7 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
     enable_interrupts();
     while(1) {
         halt();
-        puts("Interrupt occured.");
+        //puts("Interrupt occured.");
     }
 
 }
