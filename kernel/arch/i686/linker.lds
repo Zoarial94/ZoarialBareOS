@@ -1,4 +1,4 @@
-#include <arch/i686/memory.h>
+#include <kernel/arch/i686/memory.h>
 
 /* The bootloader will look at this image and start execution at the symbol
    designated as the entry point. */

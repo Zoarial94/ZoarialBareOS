@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 __attribute__((__noreturn__))
-void panic(char* str) {
+void panic(const char *str) {
 
 	printf("Entered kernel panic zone./n");
 	printf("%s", str);

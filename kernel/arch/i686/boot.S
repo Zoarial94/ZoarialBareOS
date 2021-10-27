@@ -1,4 +1,4 @@
-#include <arch/i686/memory.h>
+#include <kernel/arch/i686/memory.h>
 /* Declare constants for the multiboot header. */
 .set ALIGN,    1<<0             /* align loaded modules on page boundaries */
 .set MEMINFO,  1<<1             /* provide memory map */
@@ -217,7 +217,7 @@ movl %cr0, %ecx
 	C++ features such as global constructors and exceptions will require
 	runtime support to work as well.
 	*/
-	call _init
+	#call _init
  
 	/*
 	Enter the high-level kernel. The ABI requires the stack is 16-byte

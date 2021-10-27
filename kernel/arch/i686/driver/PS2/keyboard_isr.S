@@ -1,4 +1,4 @@
-#include <arch/i686/driver/PS2/constants.h>
+#include <kernel/arch/i686/driver/PS2/constants.h>
 
 .section .data
 

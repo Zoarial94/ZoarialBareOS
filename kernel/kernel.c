@@ -1,15 +1,15 @@
-#include <arch/i686/gdt.h>
-#include <arch/i686/idt.h>
-#include <arch/i686/pic.h>
+#include <kernel/arch/i686/gdt.h>
+#include <kernel/arch/i686/idt.h>
+#include <kernel/arch/i686/pic.h>
 
-#include <arch/i686/driver/PS2/ps2.h>
+#include <kernel/arch/i686/driver/PS2/ps2.h>
 
 #include <kernel/tty.h>
 #include <stdbool.h>
 #include <multiboot/multiboot.h>
 #include <stdio.h>
 
-#include <arch/i686/inline-asm.h>
+#include <kernel/arch/i686/inline-asm.h>
  
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__)

@@ -1,5 +1,5 @@
-#include <arch/i686/gdt.h>
-#include <arch/i686/memory.h>
+#include <kernel/arch/i686/gdt.h>
+#include <kernel/arch/i686/memory.h>
 #include <kernel/panic.h>
 
 #define GDT_CODE_PL0 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \

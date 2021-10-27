@@ -1,7 +1,7 @@
-#include <arch/i686/driver/PS2/ps2.h>
-#include <arch/i686/driver/PS2/constants.h>
-#include <arch/i686/pic.h>
-#include <arch/i686/inline-asm.h>
+#include <kernel/arch/i686/driver/PS2/ps2.h>
+#include <kernel/arch/i686/driver/PS2/constants.h>
+#include <kernel/arch/i686/pic.h>
+#include <kernel/arch/i686/inline-asm.h>
 #include <stdio.h>
 
 

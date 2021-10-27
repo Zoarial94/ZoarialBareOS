@@ -1,7 +1,7 @@
 #include <kernel/tty.h>
-#include <arch/i686/vga.h>
+#include <kernel/arch/i686/vga.h>
 #include <string.h>
-#include <arch/i686/inline-asm.h>
+#include <kernel/arch/i686/inline-asm.h>
 
 size_t terminal_row;
 size_t terminal_column;

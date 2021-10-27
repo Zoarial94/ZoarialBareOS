@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <arch/i686/driver/PS2/constants.h>
+#include <kernel/arch/i686/driver/PS2/constants.h>
 
 
 extern const uint8_t PS2_keyboard_buf[PS2_KEYBOARD_BUF_SIZE];

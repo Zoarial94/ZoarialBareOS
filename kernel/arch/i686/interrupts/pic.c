@@ -1,5 +1,5 @@
-#include <arch/i686/pic.h>
-#include <arch/i686/inline-asm.h>
+#include <kernel/arch/i686/pic.h>
+#include <kernel/arch/i686/inline-asm.h>
 
 void PIC_remap(uint32_t offset1, uint32_t offset2) {
     uint8_t a1, a2;
