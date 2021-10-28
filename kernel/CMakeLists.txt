@@ -40,20 +40,28 @@ target_sources(kernel
 
 		# The linker is a dependency (source file)
 		arch/i686/linker.lds
+
+		grub.cfg
 )
+
+#add_custom_command(
+#	OUTPUT ${CMAKE_BINARY
+
+set(PREPROCESSED_LINKER_FILE "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/kernel.dir/linker.lds")
 
 # Override the default command for the linker file
 # (add_custom_command overrides what CMake will do to the dependencies)
 add_custom_command(
 	OUTPUT CMakeFiles/kernel.dir/linker.lds
-	COMMAND "${CMAKE_C_COMPILER}" -E -P -x c-header -I include/ -I ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/arch/i686/linker.lds" -o "CMakeFiles/kernel.dir/linker.lds"
+	COMMAND "${CMAKE_C_COMPILER}" -E -P -x c-header -I include/ -I ${CMAKE_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/arch/i686/linker.lds" -o ${PREPROCESSED_LINKER_FILE}
 	MAIN_DEPENDENCY "/home/hwhite/Projects/ZoarialBareOS/kernel/arch/i686/linker.lds"
     COMMENT "Preprocessing linker.lds"
     VERBATIM
 )
 
 # Give the linker options
-target_link_options(kernel PRIVATE LINKER:-T CMakeFiles/kernel.dir/linker.lds -ffreestanding -O2 -nostdlib -lgcc)
+target_link_options(kernel PRIVATE LINKER:-T ${PREPROCESSED_LINKER_FILE} -ffreestanding -O2 -nostdlib -lgcc)
+
 # If the linker files changes, then only re-link
 set_target_properties(kernel PROPERTIES LINK_DEPENDS "kernel/CMakeFiles/kernel.dir/linker.lds")
 
