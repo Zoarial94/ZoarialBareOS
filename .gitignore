@@ -1,8 +1,10 @@
 bin/
 dep/
-build*
+build*/
 tmp/
 .vscode/
+.cache
+CMakeFiles/
 
 *.core
 

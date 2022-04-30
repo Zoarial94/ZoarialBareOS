@@ -1,5 +1,5 @@
-file ./bin/ZoarialBareOS.bin
-target remote :1234
+file ./build/kernel/kernel
+target remote :1294
 
 b kernel_main
 b isr_keyboard

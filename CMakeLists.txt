@@ -16,6 +16,8 @@ set(CMAKE_C_COMPILER ${tools}/i686-elf-gcc)
 set(CMAKE_CXX_COMPILER ${tools}/i686-elf-g++)
 set(CMAKE_ASM-ATT_COMPILER ${tools}/i686-elf-gcc)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
 project(ZoarialBareOS VERSION 0.0.1
@@ -24,7 +26,6 @@ project(ZoarialBareOS VERSION 0.0.1
 					  LANGUAGES C CXX ASM)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -82,3 +83,13 @@ include_directories(./include/libc)
 
 add_subdirectory(kernel)
 
+add_custom_target(image ALL
+  DEPENDS grub-image 
+)
+
+add_custom_target(grub-image
+  COMMAND "/bin/fish" "${ZoarialBareOS_SOURCE_DIR}/Meta/build-image-grub.fish"
+  USES_TERMINAL
+)
+
+add_dependencies(grub-image kernel)

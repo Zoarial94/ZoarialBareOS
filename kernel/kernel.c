@@ -17,7 +17,7 @@
 #endif
  
 /* This tutorial will only work for the 32-bit ix86 targets. */
-#if !defined(__i686__)
+#if !defined(__i386__)
 #error "This tutorial needs to be compiled with a ix86-elf compiler"
 #endif
 
@@ -78,9 +78,12 @@ void kernel_main(multiboot_info_t* mbt, unsigned int magic)
     printf("PIC Masks: 0x%x\n", PIC_get_mask());
 
     enable_interrupts();
+    puts("Testing again");
     while(1) {
-        halt();
-        //puts("Interrupt occured.");
+      puts("In halt loop");
+      halt();
+      puts("Interrupt occured.");
     }
+
 
 }
