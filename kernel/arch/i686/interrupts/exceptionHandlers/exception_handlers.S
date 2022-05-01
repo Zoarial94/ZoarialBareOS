@@ -1,162 +1,175 @@
-isr_exception_stub_0:
+print_string:
+.string "In ISR: %d. Stopping.\n"
+
+isr_exception_stub_common:
+    # Check EAX for stub number
     cli
+    cld
+
+    push %eax
+    push $print_string
+    call printf
     hlt
-    jmp isr_exception_stub_0
+
+isr_exception_stub_0:
+	
+    movl $0, %eax
+    jmp isr_exception_stub_common
 
 isr_exception_stub_1:
-    cli
-    hlt
-    jmp isr_exception_stub_1
+	
+	movl $1, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_2:
-    cli
-    hlt
-    jmp isr_exception_stub_2
+	
+	movl $2, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_3:
-    cli
-    hlt
-    jmp isr_exception_stub_3
+	
+	movl $3, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_4:
-    cli
-    hlt
-    jmp isr_exception_stub_4
+	
+	movl $4, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_5:
-    cli
-    hlt
-    jmp isr_exception_stub_5
+	
+	movl $5, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_6:
-    cli
-    hlt
-    jmp isr_exception_stub_6
+	
+	movl $6, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_7:
-    cli
-    hlt
-    jmp isr_exception_stub_7
+	
+	movl $7, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_8:
-    cli
-    hlt
-    jmp isr_exception_stub_8
+	
+	movl $8, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_9:
-    cli
-    hlt
-    jmp isr_exception_stub_9
+	
+	movl $9, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_10:
-    cli
-    hlt
-    jmp isr_exception_stub_10
+	
+	movl $10, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_11:
-    cli
-    hlt
-    jmp isr_exception_stub_11
+	
+	movl $11, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_12:
-    cli
-    hlt
-    jmp isr_exception_stub_12
+	
+	movl $12, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_13:
-    cli
-    hlt
-    jmp isr_exception_stub_13
+	
+	movl $13, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_14:
-    cli
-    hlt
-    jmp isr_exception_stub_14
+	
+	movl $14, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_15:
-    cli
-    hlt
-    jmp isr_exception_stub_15
+	
+	movl $15, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_16:
-    cli
-    hlt
-    jmp isr_exception_stub_16
+	
+	movl $16, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_17:
-    cli
-    hlt
-    jmp isr_exception_stub_17
+	
+	movl $17, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_18:
-    cli
-    hlt
-    jmp isr_exception_stub_18
+	
+	movl $18, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_19:
-    cli
-    hlt
-    jmp isr_exception_stub_19
+	
+	movl $19, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_20:
-    cli
-    hlt
-    jmp isr_exception_stub_20
+	
+	movl $20, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_21:
-    cli
-    hlt
-    jmp isr_exception_stub_21
+	
+	movl $21, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_22:
-    cli
-    hlt
-    jmp isr_exception_stub_22
+	
+	movl $22, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_23:
-    cli
-    hlt
-    jmp isr_exception_stub_23
+	
+	movl $23, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_24:
-    cli
-    hlt
-    jmp isr_exception_stub_24
+	
+	movl $24, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_25:
-    cli
-    hlt
-    jmp isr_exception_stub_25
+	
+	movl $25, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_26:
-    cli
-    hlt
-    jmp isr_exception_stub_26
+	
+	movl $26, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_27:
-    cli
-    hlt
-    jmp isr_exception_stub_27
+	
+	movl $27, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_28:
-    cli
-    hlt
-    jmp isr_exception_stub_28
+	
+	movl $28, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_29:
-    cli
-    hlt
-    jmp isr_exception_stub_29
+	
+	movl $29, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_30:
-    cli
-    hlt
-    jmp isr_exception_stub_30
+	
+	movl $30, %eax
+	jmp isr_exception_stub_common
 
 isr_exception_stub_31:
-    cli
-    hlt
-    jmp isr_exception_stub_31
+	
+	movl $31, %eax
+	jmp isr_exception_stub_common
 
 .global isr_exception_stub_table
 isr_exception_stub_table:

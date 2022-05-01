@@ -92,8 +92,8 @@ _start:
 	
 	# Save multiboot magic number and memory map pointer
 	mov $(stack_top - PAGE_OFFSET), %esp
-	pushl 0 # We need to 16-byte align, so add some padding
-	pushl 0 # (padding)
+	pushl $0 # We need to 16-byte align, so add some padding
+	pushl $0 # (padding)
 	push %eax
 	push %ebx
 

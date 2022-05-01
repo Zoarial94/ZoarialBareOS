@@ -37,6 +37,9 @@ inc_front:
 
 
 
+keyboard_printf_isr_string:
+.string "Received code: 0x%x\n"
+
 # Written in asm just because
 .global isr_keyboard
 .type isr_keyboard, @function
@@ -47,6 +50,11 @@ isr_keyboard:
 
     call PS2_data_read
     mov %eax, %ecx
+
+    push %ecx
+    push $keyboard_printf_isr_string
+    call printf
+    add $8, %esp
 
     cmpl $PS2_KEYBOARD_BUF_SIZE, PS2_keyboard_used_len
     je _skip_key

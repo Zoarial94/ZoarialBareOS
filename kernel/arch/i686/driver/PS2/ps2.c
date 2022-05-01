@@ -1,9 +1,8 @@
-#include <kernel/arch/i686/driver/PS2/ps2.h>
 #include <kernel/arch/i686/driver/PS2/constants.h>
-#include <kernel/arch/i686/pic.h>
+#include <kernel/arch/i686/driver/PS2/ps2.h>
 #include <kernel/arch/i686/inline-asm.h>
+#include <kernel/arch/i686/pic.h>
 #include <stdio.h>
-
 
 uint8_t PS2_data_read(void) {
     return inb(PS2_DATA_PORT);
@@ -13,15 +12,15 @@ void PS2_data_write(uint8_t data) {
     outb(PS2_DATA_PORT, data);
 }
 
-/* 
- * Status Register 
+/*
+ * Status Register
  **/
 uint8_t PS2_controller_read(void) {
     return inb(PS2_STATUS_REGISTER);
 }
 
 /*
- * Command Register 
+ * Command Register
  **/
 void PS2_controller_write(uint8_t data) {
     outb(PS2_COMMAND_REGISTER, data);
@@ -38,7 +37,7 @@ bool PS2_poll_write_status(void) {
 bool PS2_wait_on_write_timeout(uint32_t timeout) {
     uint32_t i;
     // We want the buffer we write to to be EMPTY
-    for(i = 0; PS2_poll_write_status() != 0; i++ ) {
+    for(i = 0; PS2_poll_write_status() != 0; i++) {
         if(i >= timeout) {
             return true;
         }
@@ -61,7 +60,7 @@ bool PS2_wait_on_read_timeout(uint32_t timeout) {
 
 void PS2_wait_on_write_status() {
     // We want the buffer we write to to be EMPTY
-    while(PS2_poll_write_status() != 0 ) {
+    while(PS2_poll_write_status() != 0) {
         io_wait();
     }
 }
@@ -73,7 +72,6 @@ void PS2_wait_on_read_status() {
     }
 }
 
-
 void PS2_disable_irq(void) {
     PIC_set_mask(PIC_get_mask() | PS2_PORT1_IRQ | PS2_PORT2_IRQ);
 }
@@ -82,10 +80,10 @@ void PS2_enable_irq(uint8_t flags) {
     uint16_t pic_flags = PIC_get_mask();
 
     if(flags & 1) {
-       pic_flags &= ~PS2_PORT1_IRQ;
+        pic_flags &= ~PS2_PORT1_IRQ;
     }
     if(flags & 2) {
-        //pic_flags &= ~PS2_PORT2_IRQ;
+        pic_flags &= ~PS2_PORT2_IRQ;
     }
     PIC_set_mask(pic_flags);
 }
@@ -97,29 +95,54 @@ void PS2_disable_devices(void) {
     PS2_controller_write(CMD_DISABLE_PORT2);
 }
 
-void PS2_enable_devices(uint8_t flags) {
-    if(flags & 1) {
-        PS2_wait_on_write_status();
-        PS2_controller_write(CMD_ENABLE_PORT1);
-    }
-    if(flags & 2) {
-        PS2_wait_on_write_status();
-        PS2_controller_write(CMD_ENABLE_PORT2);
-    }
+void PS2_enable_device1(void) {
+    PS2_wait_on_write_status();
+    PS2_controller_write(CMD_ENABLE_PORT1);
 }
 
+void PS2_enable_device2(void) {
+    PS2_wait_on_write_status();
+    PS2_controller_write(CMD_ENABLE_PORT2);
+}
+
+void PS2_enable_devices(uint8_t flags) {
+    if(flags & 1) {
+        PS2_enable_device1();
+    }
+    if(flags & 2) {
+        PS2_enable_device2();
+    }
+}
 
 bool PS2_controller_exists(void) {
     // TODO: Use APCI to determine if the PS2 controller exists
-    return true; 
+    return true;
 }
 
-/* 
+/*
  * Return some information back
  * Bit 0 : Port 1 is working
  * Bit 1 : Port 2 is working
  *
  * */
+
+uint8_t PS2_read_controller_config(void) {
+    PS2_wait_on_write_status();
+    PS2_controller_write(CMD_READ_CTRL_CONF);
+    PS2_wait_on_read_status();
+    return PS2_data_read();
+}
+
+void PS2_print_controller_config(void) {
+    uint8_t controller_conf = PS2_read_controller_config();
+    printf("PS2 Controller Config: 0x%x\n", controller_conf);
+}
+
+uint8_t PS2_read_and_print_controller_config(void) {
+    uint8_t controller_conf = PS2_read_controller_config();
+    printf("PS2 Controller Config: 0x%x\n", controller_conf);
+    return controller_conf;
+}
 
 uint8_t PS2_driver_initialize(void) {
     /*
@@ -136,14 +159,14 @@ uint8_t PS2_driver_initialize(void) {
      * Step 10 Reset Devices
      **/
 
-    /* 
+    /*
      * STEP 1
      **/
 
-    /* 
+    /*
      * STEP 2
      **/
-    printf("In PS2 driver.\n");
+    printf("Starting PS/2 Driver...\n");
     if(!PS2_controller_exists()) {
         printf("No controller exists\n");
         return 0;
@@ -157,11 +180,7 @@ uint8_t PS2_driver_initialize(void) {
     PS2_disable_irq();
     printf("done\n");
 
-    PS2_wait_on_write_status();
-    PS2_controller_write(CMD_READ_CTRL_CONF);
-    PS2_wait_on_read_status();
-    uint8_t controller_conf = PS2_data_read();
-    printf("PS2 CTRL CONF byte: 0x%x\n", controller_conf);
+    PS2_print_controller_config();
 
     printf("Disabling PS2 devices...");
     PS2_disable_devices();
@@ -171,34 +190,35 @@ uint8_t PS2_driver_initialize(void) {
         PS2_data_read();
     }
 
-    PS2_controller_write(CMD_READ_CTRL_CONF);
-    PS2_wait_on_read_status();
-    controller_conf = PS2_data_read();
-    printf("PS2 CTRL CONF byte: 0x%x\n",controller_conf);
+    uint8_t controller_conf = PS2_read_and_print_controller_config();
 
-    /* 
+    /*
      * If the bit is set (meaning port2 is disabled),
-     * then we have 2 ports. If it was single channel, 
+     * then we have 2 ports. If it was single channel,
      * then disabling port2 would not affect this bit.
      * (Meaning it would still be 0)
      */
-    if((controller_conf & CTRL_CONF_PORT2_CLOCK) != 0) { 
+    if((controller_conf & CTRL_CONF_PORT2_CLOCK) != 0) {
         puts("Looks like Duel Channel PS/2");
     } else {
         puts("Looks like Single Channel PS/2");
     }
 
-    /* 
+    /*
      * STEP 4
      */
     if(PS2_poll_read_status()) {
+        puts("Read Status");
         PS2_controller_read();
+    } else {
+        puts("No Read Status");
     }
 
-    /* 
+    /*
      * STEP 5
      */
-    controller_conf = controller_conf & ~(CTRL_CONF_PORT1_TRANS); // Clear keyboard translate bit
+    controller_conf = controller_conf &
+                      ~(CTRL_CONF_PORT1_TRANS); // Clear keyboard translate bit
 
     PS2_wait_on_write_status();
     PS2_controller_write(CMD_WRITE_CTRL_CONF);
@@ -215,14 +235,14 @@ uint8_t PS2_driver_initialize(void) {
     uint8_t ret_status = PS2_data_read();
 
     switch(ret_status) {
-        case CTRL_SELF_TEST_OK :
-            puts("Controller Self Test is OK");
-            break;
-        case CTRL_SELF_TEST_FAIL :
-            puts("Controller Self Test has failed");
-            return 0;
-        default:
-            printf("Controller Self Test failed with code: 0x%x\n", ret_status);
+    case CTRL_SELF_TEST_OK:
+        puts("Controller Self Test is OK");
+        break;
+    case CTRL_SELF_TEST_FAIL:
+        puts("Controller Self Test has failed");
+        return 0;
+    default:
+        printf("Controller Self Test failed with code: 0x%x\n", ret_status);
     }
 
     /*
@@ -236,7 +256,7 @@ uint8_t PS2_driver_initialize(void) {
     uint8_t port_status;
     const uint8_t PORT1 = 0x1;
     const uint8_t PORT2 = 0x2;
-    if((controller_conf & CTRL_CONF_PORT2_CLOCK) == 0) { 
+    if((controller_conf & CTRL_CONF_PORT2_CLOCK) == 0) {
         puts("Is Duel Channel PS/2");
         port_status = PORT1 | PORT2;
     } else {
@@ -250,7 +270,7 @@ uint8_t PS2_driver_initialize(void) {
     if(PS2_poll_read_status()) {
         PS2_controller_read();
     }
-    /* 
+    /*
      * STEP 8
      */
     if(port_status & PORT1) {
@@ -279,40 +299,112 @@ uint8_t PS2_driver_initialize(void) {
         }
     }
 
-    /* 
+    /*
      * STEP 9
      */
     PS2_enable_devices(port_status);
-    PS2_enable_irq(port_status);
 
     /*
-     * STEP 10
+     * STEP 10 - Reset Devices
+     * This needs cleaned up!!!
      */
-    if(port_status & 1) {
-        if(PS2_wait_on_write_timeout(200)) {
-            puts("Error waiting for write status to clear.");
-            return port_status;
+
+    bool reset_devices = true;
+    if(reset_devices) {
+        /*
+         * Resetting device 1
+         */
+        if(port_status & 1) {
+            puts("Resetting PS/2 Port 1");
+            if(PS2_wait_on_write_timeout(200)) {
+                puts("Error waiting for write status to clear.");
+                return port_status;
+            }
+            PS2_data_write(0xFF);
+
+            // Reading status after reset
+            PS2_wait_on_read_status();
+            uint8_t reset_status = PS2_data_read();
+            if(reset_status == 0xFA) {
+                puts("PS/2 Device 1 reset successfully");
+            } else if(reset_status == 0xFC) {
+                puts("PS/2 Device 1 reset failed");
+            } else {
+                printf("PS/2 Device 1 returned other error: 0x%x\n",
+                       reset_status);
+            }
+
+            // Leftovers
+            while(!PS2_wait_on_read_timeout(200)) {
+                reset_status = PS2_data_read();
+                if(reset_status == 0xFA) {
+                    puts("PS/2 Device 1 reset successfully");
+                } else if(reset_status == 0xFC) {
+                    puts("PS/2 Device 1 reset failed");
+                } else if(reset_status == 0xAA) {
+                    puts("PS/2 Device 1 Self-Test passed");
+                } else {
+                    printf("PS/2 Device 1 returned other error: 0x%x\n",
+                           reset_status);
+                }
+            }
         }
-        PS2_data_write(0xFF);
-    }
 
+        /*
+         * Restting device 2
+         */
+        if(port_status & 2) {
+            puts("Resetting PS/2 Port 2");
+            if(PS2_wait_on_write_timeout(200)) {
+                puts("Error waiting for write status to clear.");
+                return port_status;
+            }
+            PS2_controller_write(0xD4);
+            if(PS2_wait_on_write_timeout(200)) {
+                puts("Error waiting for write status to clear.");
+                return port_status;
+            }
+            PS2_data_write(0xFF);
 
-    if(port_status & 2) {
-        if(PS2_wait_on_write_timeout(200)) {
-            puts("Error waiting for write status to clear.");
-            return port_status;
-        }
-        PS2_controller_write(0xD4);
-        if(PS2_wait_on_write_timeout(200)) {
-            puts("Error waiting for write status to clear.");
-            return port_status;
-        }
-        PS2_data_write(0xFF);
-    }
+            // Check for success status
+            PS2_wait_on_read_status();
+            uint8_t reset_status = PS2_data_read();
+            if(reset_status == 0xAA) {
+                PS2_wait_on_read_status();
+                reset_status = PS2_data_read();
+                if(reset_status == 0xFA) {
+                    puts("PS/2 Device 2 reset successfully");
+                } else if(reset_status == 0xFC) {
+                    puts("PS/2 Device 2 reset failed");
+                } else {
+                    printf("PS/2 Device 2 returned other error: 0x%x\n",
+                           reset_status);
+                }
+            } else if(reset_status == 0xFC) {
+                puts("PS/2 Device 2 reset failed");
+            } else {
+                printf("PS/2 Device 2 returned other error: 0x%x\n",
+                       reset_status);
+            }
+            // Leftovers
+            while(!PS2_wait_on_read_timeout(200)) {
+                reset_status = PS2_data_read();
+                if(reset_status == 0xFA) {
+                    puts("PS/2 Device 2 reset successfully");
+                } else if(reset_status == 0xFC) {
+                    puts("PS/2 Device 2 reset failed");
+                } else if(reset_status == 0xAA) {
+                    puts("PS/2 Device 2 Self-Test passed");
+                } else {
+                    printf("PS/2 Device 2 returned other error: 0x%x\n",
+                           reset_status);
+                }
+            } // Leftovers
+        }     // Device 2 reset
+    }         // Restting
 
-
+    PS2_enable_irq(port_status);
     puts("Finished PS2 initialization.");
 
     return port_status;
-
 }
