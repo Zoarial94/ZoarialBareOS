@@ -83,13 +83,19 @@ include_directories(./include/libc)
 
 add_subdirectory(kernel)
 
-add_custom_target(image ALL
-  DEPENDS grub-image 
+add_custom_target(run 
+    COMMAND "${ZoarialBareOS_SOURCE_DIR}/Meta/run-image-libvirt.fish"
+    DEPENDS image
+)
+
+add_custom_target(image
+    DEPENDS grub-image 
 )
 
 add_custom_target(grub-image
-  COMMAND "/bin/fish" "${ZoarialBareOS_SOURCE_DIR}/Meta/build-image-grub.fish"
-  USES_TERMINAL
+    COMMAND "${ZoarialBareOS_SOURCE_DIR}/Meta/build-image-grub.fish"
+    DEPENDS kernel
+    USES_TERMINAL
 )
 
-add_dependencies(grub-image kernel)
+#add_dependencies(grub-image kernel)

@@ -5,6 +5,7 @@ tmp/
 .vscode/
 .cache
 CMakeFiles/
+tags
 
 *.core
 
