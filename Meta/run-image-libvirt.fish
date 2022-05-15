@@ -1,7 +1,8 @@
 #!/bin/fish
-set VM_NAME ZoarialBareOS
+set -gx VM_NAME ZoarialBareOS
 
-set VM_STATE (virsh domstate $VM)
+echo "VM_NAME: $VM_NAME"
+set VM_STATE (virsh domstate $VM_NAME)
 echo "VM State: $VM_STATE"
 switch (string trim "$VM_STATE")
     case "shut off" crashed
